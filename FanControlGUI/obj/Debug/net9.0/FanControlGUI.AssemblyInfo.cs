@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FanControlGUI")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c7c0b115c57c44f559f7d17b38f66c90d0a76668")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0b19f7da08f0de04688b138b3e6148ed9568c357")]
 [assembly: System.Reflection.AssemblyProductAttribute("FanControlGUI")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FanControlGUI")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
