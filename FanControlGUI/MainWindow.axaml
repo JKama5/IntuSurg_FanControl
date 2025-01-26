@@ -4,6 +4,7 @@
         Title="Fan Control"
         Width="600"
         Height="400">
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

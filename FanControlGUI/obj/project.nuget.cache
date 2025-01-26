@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "HLXFhWc39GI=",
+  "dgSpecHash": "8idgUeAvsAc=",
   "success": true,
   "projectFilePath": "/home/jack/IntuSurg_FanControl/FanControlGUI/FanControlGUI.csproj",
   "expectedPackageFiles": [
+    "/home/jack/.nuget/packages/animatedimage.avalonia/2.0.0/animatedimage.avalonia.2.0.0.nupkg.sha512",
     "/home/jack/.nuget/packages/avalonia/11.2.1/avalonia.11.2.1.nupkg.sha512",
     "/home/jack/.nuget/packages/avalonia.angle.windows.natives/2.1.22045.20230930/avalonia.angle.windows.natives.2.1.22045.20230930.nupkg.sha512",
     "/home/jack/.nuget/packages/avalonia.buildservices/0.0.29/avalonia.buildservices.0.0.29.nupkg.sha512",

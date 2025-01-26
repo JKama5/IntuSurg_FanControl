@@ -65,3 +65,5 @@
 /home/jack/IntuSurg_FanControl/FanControlGUI/obj/Debug/net9.0/FanContr.CA84E0D0.Up2Date
 /home/jack/IntuSurg_FanControl/FanControlGUI/obj/Debug/net9.0/FanControlGUI.genruntimeconfig.cache
 /home/jack/IntuSurg_FanControl/FanControlGUI/obj/Debug/net9.0/ref/FanControlGUI.dll
+/home/jack/IntuSurg_FanControl/FanControlGUI/bin/Debug/net9.0/AnimatedImage.Avalonia.dll
+/home/jack/IntuSurg_FanControl/FanControlGUI/bin/Debug/net9.0/AnimatedImage.dll

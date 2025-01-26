@@ -11,31 +11,35 @@ namespace FanControlGUI
 {
     public partial class MainWindow : Window
     {
-        private List<Subsystem> subsystems = new();
-        private DispatcherTimer timer;
-        private const string LogFilePath = "system_log.txt";
+        private List<Subsystem> subsystems = new(); // Stores all subsystem objects containing fan information
+        private DispatcherTimer timer; // Timer for periodic "real-time" updates to fan speeds and UI
+        private const string LogFilePath = "system_log.txt"; // Path for the log file storing system performance data
 
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent(); // Auto-generated UI initialization
 
-            // Schedule the configuration prompt after the window becomes visible
+            // Schedule a configuration prompt once the window becomes visible
             Dispatcher.UIThread.Post(async () => await PromptForConfiguration(), DispatcherPriority.Background);
 
-            // Initialize and start the timer for real-time updates
+            // Initialize and start a timer to update fan speeds every second
             timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             timer.Tick += UpdateFanSpeeds;
             timer.Start();
 
-            InitializeLogFile();
+            InitializeLogFile(); // Prepares the log file for storing system activity
         }
+
+        /// <summary>
+        /// Initializes the log file by writing the header row. If the file exists, it will be overwritten.
+        /// </summary>
         private void InitializeLogFile()
         {
             try
             {
                 using (StreamWriter writer = new StreamWriter(LogFilePath, false))
                 {
-                    writer.WriteLine("Timestamp,SubsystemID,MaxTemperature, FanID,FanSpeed,FanMaxRPM");
+                    writer.WriteLine("Timestamp,SubsystemID,MaxTemperature,FanID,FanSpeed,FanMaxRPM");
                 }
             }
             catch (Exception ex)
@@ -44,36 +48,44 @@ namespace FanControlGUI
             }
         }
 
+        /// <summary>
+        /// Periodically updates fan speeds and subsystem temperatures, saves logs, and refreshes the UI.
+        /// </summary>
+        /// <param name="sender">The source of the event (timer).</param>
+        /// <param name="e">Event data.</param>
         private void UpdateFanSpeeds(object? sender, EventArgs e)
         {
-            float globalMaxTemperature = 0;
+            float MaxTemperatureAllSubsystems = 0;
 
-            // Determine the maximum temperature across all subsystems
+            // Simulate temperature updates and determine the highest temperature across subsystems
             foreach (var subsystem in subsystems)
             {
-                float range = new Random().NextSingle(); // Mock temperature
-                float factor = new Random().Next(0, 100);
-                float temperature = range * factor;
+                float range = new Random().NextSingle(); // Generate a random temperature range (0.00 to 1.00)
+                float temperature = range * 100; // Calculate temperature for the subsystem (maximum of 100 in this example)
                 subsystem.MaxTemperature = temperature;
-                globalMaxTemperature = Math.Max(globalMaxTemperature, temperature);
+                MaxTemperatureAllSubsystems = Math.Max(MaxTemperatureAllSubsystems, temperature); // Update global maximum
             }
 
-            // Calculate the fan speed percentage based on the global maximum temperature
-            double speedPercentage = CalculateSpeedPercentage(globalMaxTemperature);
+            // Compute fan speed percentage based on the highest temperature
+            double speedPercentage = CalculateSpeedPercentage(MaxTemperatureAllSubsystems);
 
-            // Update all fans in all subsystems
+            // Update the speed of each fan in every subsystem
             foreach (var subsystem in subsystems)
             {
                 foreach (var fan in subsystem.Fans)
                 {
-                    fan.UpdateSpeed(speedPercentage);
+                    fan.UpdateSpeed(speedPercentage); // Adjust fan speed based on computed percentage
                 }
             }
-            SaveLog(globalMaxTemperature);
-            // Refresh the UI
-            RefreshSubsystemUI();
+
+            SaveLog(MaxTemperatureAllSubsystems); // Record current system state in the log file
+            RefreshSubsystemUI(); // Refresh UI to reflect updated speeds and temperatures
         }
 
+        /// <summary>
+        /// Writes the current state of all subsystems and fans to the log file.
+        /// </summary>
+        /// <param name="globalMaxTemperature">The highest temperature across all subsystems.</param>
         private void SaveLog(double globalMaxTemperature)
         {
             try
@@ -86,7 +98,7 @@ namespace FanControlGUI
                     {
                         foreach (var fan in subsystem.Fans)
                         {
-                            writer.WriteLine($"{timestamp}\t{subsystem.SubsystemId}\t{subsystem.MaxTemperature:F2}\t{fan.FanId},\t{fan.Speed:F0}\t{fan.MaxRPM}");
+                            writer.WriteLine($"{timestamp},{subsystem.SubsystemId},{subsystem.MaxTemperature:F2},{fan.FanId},{fan.Speed:F0},{fan.MaxRPM}");
                         }
                     }
                 }
@@ -97,16 +109,23 @@ namespace FanControlGUI
             }
         }
 
+        /// <summary>
+        /// Updates the UI to display the current temperature and fan speeds for all subsystems.
+        /// </summary>
         private void RefreshSubsystemUI()
         {
-            // Ensure SubsystemPanel exists
-            var SubsystemPanel = this.FindControl<StackPanel>("SubsystemPanel");
-            SubsystemPanel.Children.Clear();
+            var SubsystemPanel = this.FindControl<StackPanel>("SubsystemPanel"); // Locate the main UI panel for subsystems
+            SubsystemPanel.Children.Clear(); // Clear previous subsystem entries
 
             foreach (var subsystem in subsystems)
             {
                 var subsystemPanel = new StackPanel { Margin = new Thickness(0, 10, 0, 10) };
-                subsystemPanel.Children.Add(new TextBlock { Text = $"Subsystem {subsystem.SubsystemId} - Temp: {subsystem.MaxTemperature:F2}°C", FontSize = 16, FontWeight = Avalonia.Media.FontWeight.Bold });
+                subsystemPanel.Children.Add(new TextBlock
+                {
+                    Text = $"Subsystem {subsystem.SubsystemId} - Temp: {subsystem.MaxTemperature:F2}°C",
+                    FontSize = 16,
+                    FontWeight = Avalonia.Media.FontWeight.Bold
+                });
 
                 foreach (var fan in subsystem.Fans)
                 {
@@ -116,17 +135,25 @@ namespace FanControlGUI
                     });
                 }
 
-                SubsystemPanel.Children.Add(subsystemPanel);
+                SubsystemPanel.Children.Add(subsystemPanel); // Add the subsystem's panel to the main UI
             }
         }
 
+        /// <summary>
+        /// Calculates the fan speed percentage based on the given temperature using a piecewise linear function.
+        /// </summary>
+        /// <param name="temperature">The current temperature to evaluate.</param>
+        /// <returns>A speed percentage as a double (0.2 to 1.0).</returns>
         private double CalculateSpeedPercentage(float temperature)
         {
-            if (temperature >= 75) return 1.0f;
-            if (temperature <= 25) return 0.2f;
-            return 0.2f + (temperature - 25) / 50 * 0.8f;
+            if (temperature >= 75) return 1.0f; // Maximum speed at temperatures >= 75°C
+            if (temperature <= 25) return 0.2f; // Minimum speed at temperatures <= 25°C
+            return 0.2f + (temperature - 25) / 50 * 0.8f; // Linear interpolation for temperatures between 25°C and 75°C
         }
 
+        /// <summary>
+        /// Guides the user through subsystem and fan configuration at startup.
+        /// </summary>
         private async Task PromptForConfiguration()
         {
             var numSubsystems = await PromptForInteger("Enter the number of subsystems:");
@@ -145,9 +172,14 @@ namespace FanControlGUI
                 subsystems.Add(new Subsystem { SubsystemId = i + 1, Fans = fans });
             }
 
-            DisplaySubsystemConfiguration();
+            DisplaySubsystemConfiguration(); // Update UI to reflect newly configured subsystems
         }
 
+        /// <summary>
+        /// Prompts the user to input a positive integer with error handling for invalid inputs.
+        /// </summary>
+        /// <param name="message">The message displayed in the input dialog.</param>
+        /// <returns>The user's input as a positive integer.</returns>
         private async Task<int> PromptForInteger(string message)
         {
             while (true)
@@ -167,16 +199,23 @@ namespace FanControlGUI
             }
         }
 
-        private async void DisplaySubsystemConfiguration()
+        /// <summary>
+        /// Displays the current configuration of subsystems and fans in the UI.
+        /// </summary>
+        private void DisplaySubsystemConfiguration()
         {
-            // Ensure SubsystemPanel exists
-            var SubsystemPanel = this.FindControl<StackPanel>("SubsystemPanel");
-            SubsystemPanel.Children.Clear();
+            var SubsystemPanel = this.FindControl<StackPanel>("SubsystemPanel"); // Locate the main UI panel for subsystems
+            SubsystemPanel.Children.Clear(); // Clear previous configurations
 
             foreach (var subsystem in subsystems)
             {
                 var subsystemPanel = new StackPanel { Margin = new Thickness(0, 10, 0, 10) };
-                subsystemPanel.Children.Add(new TextBlock { Text = $"Subsystem {subsystem.SubsystemId} - Temp: {subsystem.MaxTemperature:F2}°C", FontSize = 16, FontWeight = Avalonia.Media.FontWeight.Bold });
+                subsystemPanel.Children.Add(new TextBlock
+                {
+                    Text = $"Subsystem {subsystem.SubsystemId} - Temp: {subsystem.MaxTemperature:F2}°C",
+                    FontSize = 16,
+                    FontWeight = Avalonia.Media.FontWeight.Bold
+                });
 
                 foreach (var fan in subsystem.Fans)
                 {
@@ -186,7 +225,7 @@ namespace FanControlGUI
                     });
                 }
 
-                SubsystemPanel.Children.Add(subsystemPanel);
+                SubsystemPanel.Children.Add(subsystemPanel); // Add the subsystem's panel to the main UI
             }
         }
     }
