@@ -1,0 +1,12 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="FanControlGUI.MainWindow"
+        Title="Fan Control"
+        Width="500"
+        Height="200">
+    <StackPanel Margin="10">
+        <TextBox x:Name="TempInput" Width="300" Margin="0,0,0,10" />
+        <Button Content="Update Fan Speed" Click="UpdateFanSpeed" />
+        <TextBlock x:Name="FanSpeedLabel" Text="Fan Speed: 0%" Margin="0,10,0,0" />
+    </StackPanel>
+</Window>
