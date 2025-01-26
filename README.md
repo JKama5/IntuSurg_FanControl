@@ -8,8 +8,11 @@ To run this project you need the following:
 
 # Steps to Set Up
 1. Clone the repository: `git clone https://github.com/JKama5/IntuSurg_FanControl.git`
-2. Navigate to the project folder: `cd FanControlGUI`
+2. Navigate to the project folder: `cd IntuSurg_FanControl/FanControlGUI`
 3. Restore NuGet packages: `dotnet restore` 
 4. Build the program: `dotnet build`
 5. Run the application: `dotnet run`
 
+# Demo Video
+If you are unable to run this code for any reason, I posted a demo video of the code's operation with its simple GUI.
+It can be found in `IntuSurg_FanControl` under the file name   `Simple_Demo.mkv`
