@@ -1,7 +1,7 @@
 # System Requirements
 To run this project you need the following:
 
-1. .NET SDK vsersion 9.0
+1. .NET SDK vsersion 9.0 https://dotnet.microsoft.com/en-us/download
 2. Operating System:
    - Windows, Linux, or macOS 
    - **Tested on Ubuntu 22.04**
