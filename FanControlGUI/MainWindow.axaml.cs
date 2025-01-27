@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using FanControlGUI.Objects;
 using Avalonia;
+using Avalonia.Media;
 using System.IO;
 
 namespace FanControlGUI
@@ -14,7 +15,10 @@ namespace FanControlGUI
         private List<Subsystem> subsystems = new(); // Stores all subsystem objects containing fan information
         private DispatcherTimer timer; // Timer for periodic "real-time" updates to fan speeds and UI
         private const string LogFilePath = "system_log.txt"; // Path for the log file storing system performance data
-
+        private DispatcherTimer _animationTimer; // Timer for the fan animation
+        private double _currentAngle = 0; // Stores the current "angle" of the fan 
+        public double _fan_animate_speed = 0; // Stores the speed of the fans
+        private RotateTransform _fanTransform; 
         public MainWindow()
         {
             InitializeComponent(); // Auto-generated UI initialization
@@ -26,6 +30,18 @@ namespace FanControlGUI
             timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             timer.Tick += UpdateFanSpeeds;
             timer.Start();
+
+            var fanImage = this.FindControl<Image>("FanImage");
+            _fanTransform = new RotateTransform { CenterX = 50, CenterY = 50 };
+            fanImage.RenderTransform = _fanTransform;
+            
+            // Initialize the timer for animation
+            _animationTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(16)
+            };
+            _animationTimer.Tick += (sender, e) => AnimateFan();
+            _animationTimer.Start();
 
             InitializeLogFile(); // Prepares the log file for storing system activity
         }
@@ -68,7 +84,7 @@ namespace FanControlGUI
 
             // Compute fan speed percentage based on the highest temperature
             double speedPercentage = CalculateSpeedPercentage(MaxTemperatureAllSubsystems);
-
+            _fan_animate_speed = speedPercentage;
             // Update the speed of each fan in every subsystem
             foreach (var subsystem in subsystems)
             {
@@ -131,7 +147,7 @@ namespace FanControlGUI
                 {
                     subsystemPanel.Children.Add(new TextBlock
                     {
-                        Text = $"Fan {fan.FanId}: {fan.Speed:F0} RPM (Max: {fan.MaxRPM} RPM, Speed Percentage: {fan.Speed / fan.MaxRPM * 100:F2}%)"
+                        Text = $"Fan {fan.FanId}: {fan.Speed:F0} RPM (Max: {fan.MaxRPM} RPM)"
                     });
                 }
 
@@ -146,9 +162,9 @@ namespace FanControlGUI
         /// <returns>A speed percentage as a double (0.2 to 1.0).</returns>
         private double CalculateSpeedPercentage(float temperature)
         {
-            if (temperature >= 75) return 1.0f; // Maximum speed at temperatures >= 75°C
-            if (temperature <= 25) return 0.2f; // Minimum speed at temperatures <= 25°C
-            return 0.2f + (temperature - 25) / 50 * 0.8f; // Linear interpolation for temperatures between 25°C and 75°C
+            if (temperature >= 75) return 1.0; // Maximum speed at temperatures >= 75°C
+            if (temperature <= 25) return 0.2; // Minimum speed at temperatures <= 25°C
+            return 0.2 + (temperature - 25) / 50 * 0.8; // Linear interpolation for temperatures between 25°C and 75°C
         }
 
         /// <summary>
@@ -221,12 +237,30 @@ namespace FanControlGUI
                 {
                     subsystemPanel.Children.Add(new TextBlock
                     {
-                        Text = $"Fan {fan.FanId}: {fan.Speed:F0} RPM (Max: {fan.MaxRPM} RPM, Speed Percentage: {fan.Speed / fan.MaxRPM * 100:F2}%)"
+                        Text = $"Fan {fan.FanId}: {fan.Speed:F0} RPM (Max: {fan.MaxRPM} RPM"
                     });
                 }
 
                 SubsystemPanel.Children.Add(subsystemPanel); // Add the subsystem's panel to the main UI
             }
+        }
+
+        private void AnimateFan()
+        {
+            // Get speed from the fans
+            double speed = 20 * _fan_animate_speed;
+            
+            // Update the rotation angle
+            _currentAngle += speed;
+            if (_currentAngle >= 360)
+                _currentAngle -= 360;
+
+            // Apply the rotation to the fan transform
+            _fanTransform.Angle = _currentAngle;
+
+            // Update fan speed display
+            var fanSpeedText = this.FindControl<TextBlock>("FanSpeedText");
+            fanSpeedText.Text = $"Fan Speed: {_fan_animate_speed*100:F0} %";
         }
     }
 }

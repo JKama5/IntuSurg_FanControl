@@ -19,5 +19,22 @@
         <ScrollViewer Grid.Row="1" Margin="10">
             <StackPanel x:Name="SubsystemPanel" />
         </ScrollViewer>
+        <Canvas>
+        <Image Name="FanImage"
+                Source="Assets/fan.png"
+                Width="100" Height="100"
+                RenderTransformOrigin="0.5,0.5"
+                Canvas.Top="10" Canvas.Left="475" />
+        <TextBlock Name="FanSpeedText"
+                Canvas.Top="120"
+                Canvas.Left="466"
+                FontSize="14"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Foreground="Black"
+                Text="Fan Speed: 20 %" />
+
+        </Canvas>
     </Grid>
+    
 </Window>
