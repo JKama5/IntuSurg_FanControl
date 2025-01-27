@@ -16,3 +16,7 @@ To run this project you need the following:
 # Demo Video
 If you are unable to run this code for any reason, I posted a demo video of the code's operation with its simple GUI.
 It can be found in `IntuSurg_FanControl` under the file name   `Simple_Demo.mkv`
+
+
+### Learning Avalonia UI
+This is my first time using the Avalonia UI and I found [this](https://docs.avaloniaui.net/docs/overview/what-is-avalonia) tutorial to be an excellent resource in getting started and doing some advanced graphics.
