@@ -7,6 +7,7 @@ using FanControlGUI.Objects;
 using Avalonia;
 using Avalonia.Media;
 using System.IO;
+using Tmds.DBus.Protocol;
 
 namespace FanControlGUI
 {
@@ -262,5 +263,6 @@ namespace FanControlGUI
             var fanSpeedText = this.FindControl<TextBlock>("FanSpeedText");
             fanSpeedText.Text = $"Fan Speed: {_fan_animate_speed*100:F0} %";
         }
+
     }
 }
